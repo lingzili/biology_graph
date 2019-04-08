@@ -21,15 +21,25 @@ week0_p1 <- BW_long %>%
   ggplot(aes(x = Genotype, y = Weight, fill = Genotype)) +
   geom_boxplot(position = position_dodge(0.8)) +
   geom_jitter(width = .05, size = 3) +
-  facet_grid(cols = vars(Sex)) +
-  guides(fill = "none") +
+  facet_grid(cols = vars(Sex))
+
+week0_p2 <- week0_p1 +
   ylim(20, 40) + # Set y axis
-  labs(title = "Week 0", x = NULL, y = "Weight (g)") +
-  theme_classic()
+  labs(title = "Start of HFD (11 - 12 weeks age)", x = NULL, y = "Weight (g)") +
+  guides(fill = "none") + # Remove legends
+  theme(
+    axis.line = element_line(colour = "black"),
+    axis.text.x = element_text(color = "black", size = 14, face = "bold"),
+    axis.text.y = element_text(color = "black", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "black", size = 14, face = "bold"),
+    strip.text.x = element_text(color = "black", size = 14),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    panel.background = element_blank()
+  )
 
-week0_p1
+week0_p2
 
-ggsave(here::here("graph/BW_week0.png"), week0_p1)
+ggsave(here::here("graph/BW_week0.png"), week0_p2)
 
 # Fed glycemia (mM) -------------------------------------------------------
 # Load data set
@@ -47,15 +57,23 @@ View(Glc_long)
 week0_p1 <- Glc_long %>%
   filter(Week == "Week 0") %>%
   ggplot(aes(x = Genotype, y = Glycemia, fill = Genotype)) +
-  geom_boxplot(position = position_dodge(0.8)) 
+  geom_boxplot(position = position_dodge(0.8)) +
+  geom_jitter(width = .05, size = 3) +
+  facet_grid(cols = vars(Sex))
 
 week0_p2 <- week0_p1 +
-  geom_jitter(width = .05, size = 3) +
-  facet_grid(cols = vars(Sex)) +
-  guides(fill = "none") +
   ylim(0, 15) + # Set y axis
-  labs(title = "Week 0", x = NULL, y = "Fed blood glucose (mM)") +
-  theme_classic()
+  labs(title = "Start of HFD (11 - 12 weeks age)", x = NULL, y = "Fed blood glucose (mM)") +
+  guides(fill = "none") + # Remove legends
+  theme(
+    axis.line = element_line(colour = "black"),
+    axis.text.x = element_text(color = "black", size = 14, face = "bold"),
+    axis.text.y = element_text(color = "black", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "black", size = 14, face = "bold"),
+    strip.text.x = element_text(color = "black", size = 14),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    panel.background = element_blank()
+  )
 
 week0_p2
 
