@@ -28,6 +28,12 @@ GTT_min <- subset(GTT, select = -c(min0_n1:min120_n2))
 
 View(GTT_min)
 
+# Calculate n number in each group
+GTT_min %>%
+  filter(Diet_duration == "1 week") %>%
+  group_by(Sex, Diet) %>%
+  summarise(total.count = n())
+
 # Change to long format
 GTT_long <- GTT_min %>%
   gather(Minute, Glycemia, 6:11)
@@ -74,7 +80,7 @@ week1_p2 <- week1_p1 +
     panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
     panel.background = element_blank(),
     legend.key = element_rect(fill = "white") # Remove grey background of the legend
-  ) 
+  )
 
 week1_p2
 
