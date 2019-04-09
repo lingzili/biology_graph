@@ -16,6 +16,9 @@ BW_long <- BW %>%
 View(BW_long)
 
 # Plot week 0 data based on sex and genotype
+# Rank the sex
+BW_long$Sex <- factor(BW_long$Sex, levels = c("Male", "Female"))
+
 week0_p1 <- BW_long %>%
   filter(Week == "Week 0") %>%
   ggplot(aes(x = Genotype, y = Weight, fill = Genotype)) +
@@ -39,7 +42,7 @@ week0_p2 <- week0_p1 +
 
 week0_p2
 
-ggsave(here::here("graph/BW_week0.png"), week0_p2)
+ggsave(here::here("graph/BW_week0.png"), week0_p2) # Save 7.36 x 4.55 in image
 
 # Fed glycemia (mM) -------------------------------------------------------
 # Load data set
@@ -54,6 +57,9 @@ Glc_long <- Glc %>%
 View(Glc_long)
 
 # Plot week 0 data based on sex and genotype
+# Rank the sex
+Glc_long$Sex <- factor(Glc_long$Sex, levels = c("Male", "Female"))
+
 week0_p1 <- Glc_long %>%
   filter(Week == "Week 0") %>%
   ggplot(aes(x = Genotype, y = Glycemia, fill = Genotype)) +
@@ -77,4 +83,4 @@ week0_p2 <- week0_p1 +
 
 week0_p2
 
-ggsave(here::here("graph/Fed_Glc_week0.png"), week0_p2)
+ggsave(here::here("graph/Fed_Glc_week0.png"), week0_p2) #Save 7.36 x 4.55 in image
