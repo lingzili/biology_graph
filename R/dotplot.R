@@ -149,6 +149,46 @@ Mass <- read_excel("data/Gcg_DEXA.xlsx", col_types = c(
 ))
 View(Mass)
 
+# Plot absolute values of fat and lean mass
+Mass_long <- Mass %>%
+  select(-c(Total_gram)) %>%
+  gather(Composition, Gram, 6:7) %>%
+  arrange(ID)
+
+View(Mass_long)
+
+# Remove "_gram" from data labels
+Mass_long$Composition <- gsub("_gram", "", Mass_long$Composition)
+
+# Rank the sex
+Mass_long$Sex <- factor(Mass_long$Sex, levels = c("Male", "Female"))
+
+# Plot fat mass of week 1
+week1_p1 <- Mass_long %>%
+  filter(Composition == "Fat") %>%
+  ggplot(aes(x = Diet, y = Gram, fill = Diet)) +
+  geom_boxplot(position = position_dodge(0.8)) +
+  geom_jitter(width = .05, size = 3) +
+  facet_grid(cols = vars(Sex))
+
+week1_p2 <- week1_p1 +
+  ylim(2, 6) +
+  labs(title = "1 week of HFD: Fat mass", x = NULL, y = "Fat mass (g)") +
+  guides(fill = "none") + # Remove legends
+  theme(
+    axis.line = element_line(colour = "black"),
+    axis.text.x = element_text(color = "black", size = 14, face = "bold"),
+    axis.text.y = element_text(color = "black", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "black", size = 14, face = "bold"),
+    strip.text.x = element_text(color = "black", size = 14),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    panel.background = element_blank()
+  )
+
+week1_p2
+
+ggsave(here::here("graph/Fat_mass_abs_week1.png"), week1_p2) # Save 7.36 x 4.43 in image
+
 # Calculate percentage of fat and lean mass
 Mass$Lean_percent <- Mass$Lean_gram / Mass$Total_gram * 100
 Mass$Fat_percent <- Mass$Fat_gram / Mass$Total_gram * 100
