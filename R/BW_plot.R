@@ -5,7 +5,8 @@ library(readxl)
 BW <- read_excel("data/Gcg_BW.xlsx", col_types = c("text", "text", "text", "text", "numeric", "numeric", "numeric", "numeric", "numeric"))
 View(BW)
 
-# Lineplot: body weight over time -----------------------------------------
+# Lineplot with points: body weight over time -----------------------------
+
 # Change from wide to long format
 BW_long <- BW %>%
   na.omit() %>% # Remove rows with missting values
@@ -61,7 +62,7 @@ BW_p2
 
 ggsave(here::here("graph/Cohort1_BW.png"), BW_p2)
 
-# Boxplot: Body weight with groups ----------------------------------------
+# Boxplot + dotplot: Body weight, 1-week HFD ------------------------------
 
 # Change from wide to long format
 BW_long <- BW %>%
@@ -73,52 +74,36 @@ View(BW_long)
 # Rank the sex
 BW_long$Sex <- factor(BW_long$Sex, levels = c("Male", "Female"))
 
-# Plot week 1 data based on sex and genotype****
+# Plot week 1 data based on sex and diet (standard plot)
 week1_p1 <- BW_long %>%
   filter(Week == "Week 1") %>%
-  ggplot(aes(x = Sex, y = Weight, fill = Diet)) +
-  geom_boxplot(position = position_dodge(width = 1), outlier.size = 0) +
-  geom_point(position = position_jitterdodge(dodge.width = 1), size = 3) 
-
-week1_p2 <- week1_p1 +
-  labs(title = "1-week HFD", x = NULL, y = "Weight (g)") +
-  theme(
-    axis.line = element_line(colour = "black"),
-    axis.text.x = element_text(color = "black", size = 14, face = "bold"),
-    axis.text.y = element_text(color = "black", size = 14, face = "bold"),
-    axis.title.y = element_text(color = "black", size = 14, face = "bold"),
-    strip.text.x = element_text(color = "black", size = 14),
-    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-    panel.background = element_blank()
-  )
-
-week1_p2
-
-ggsave(here::here("graph/BW_week0.png"), week0_p2) # Save 7.36 x 4.55 in image
-
-# Plot absolute weight of week 1
-
-week1_p1 <- BW_long %>%
-  filter(Week == "Week 1") %>%
-  ggplot(aes(x = Diet, y = Weight, fill = Diet)) +
-  geom_boxplot(position = position_dodge(0.8)) +
-  geom_jitter(width = .05, size = 3) +
-  facet_grid(cols = vars(Sex))
+  ggplot(aes(x = Sex, y = Weight)) +
+  geom_boxplot(aes(fill = Diet), position = position_dodge(width = 1), outlier.size = 0) +
+  # Change fill color of the boxes
+  scale_fill_manual(values = c("green3", "red")) +
+  # Overlay dotplot
+  geom_dotplot(aes(color = Diet), binwidth = .5, stackdir = "center",
+    binaxis = "y", position = position_dodge(width = 1)
+  ) +
+  # Change the dot color to black
+  scale_colour_manual(values = c("black", "black"))
 
 week1_p2 <- week1_p1 +
   ylim(20, 40) +
-  labs(title = "1 week of HFD: Body weight", x = NULL, y = "Body weight (g)") +
-  guides(fill = "none") + # Remove legends
+  labs(title = "1-week HFD", x = NULL, y = "Weight (g)") +
+  # Remove the label of the dots
+  guides(color = FALSE) +
   theme(
     axis.line = element_line(colour = "black"),
     axis.text.x = element_text(color = "black", size = 14, face = "bold"),
     axis.text.y = element_text(color = "black", size = 14, face = "bold"),
     axis.title.y = element_text(color = "black", size = 14, face = "bold"),
-    strip.text.x = element_text(color = "black", size = 14),
+    legend.title = element_text(color = "black", size = 14, face = "bold"),
+    legend.text = element_text(color = "black", size = 14, face = "bold"),
     panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
     panel.background = element_blank()
   )
-
+  
 week1_p2
 
-ggsave(here::here("graph/Weight_Week1.png"), week1_p2)
+ggsave(here::here("graph/BW_week1_boxplot.png"), week1_p2) # Save 7.36 x 4.55 in image
