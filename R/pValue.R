@@ -70,8 +70,8 @@ p_fat <- list()
 
 for (i in unique(Mass_long$Sex)) {
   df <- Mass_long %>%
-    filter(Sex == i, Composition == "Lean") %>%
-    spread(Diet, Percent)
+    filter(Sex == i, Composition == "Fat") %>%
+    spread(Diet, Gram)
 
   print(df)
 

@@ -43,6 +43,33 @@ week0_p2
 
 ggsave(here::here("graph/BW_week0.png"), week0_p2) # Save 7.36 x 4.55 in image
 
+# Plot absolute weight of week 1
+
+week1_p1 <- BW_long %>%
+  filter(Week == "Week 1") %>%
+  ggplot(aes(x = Diet, y = Weight, fill = Diet)) +
+  geom_boxplot(position = position_dodge(0.8)) +
+  geom_jitter(width = .05, size = 3) +
+  facet_grid(cols = vars(Sex))
+
+week1_p2 <- week1_p1 +
+  ylim(20, 40) +
+  labs(title = "1 week of HFD: Body weight", x = NULL, y = "Body weight (g)") +
+  guides(fill = "none") + # Remove legends
+  theme(
+    axis.line = element_line(colour = "black"),
+    axis.text.x = element_text(color = "black", size = 14, face = "bold"),
+    axis.text.y = element_text(color = "black", size = 14, face = "bold"),
+    axis.title.y = element_text(color = "black", size = 14, face = "bold"),
+    strip.text.x = element_text(color = "black", size = 14),
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    panel.background = element_blank()
+  )
+
+week1_p2
+
+ggsave(here::here("graph/Weight_Week1.png"), week1_p2)
+
 # Percentage of weight gain -----------------------------------------------
 # Calculate percentage of weight gain
 BW$Percent_Week1 <- (BW$`Week 1`/BW$`Week 0` - 1) * 100
