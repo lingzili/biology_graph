@@ -6,6 +6,7 @@ BW <- read_excel("data/Gcg_BW.xlsx", col_types = c("text", "text", "text", "text
 View(BW)
 
 # Lineplot with points: body weight over time -----------------------------
+# First set the standard plot theme
 
 # Change from wide to long format
 BW_long <- BW %>%
