@@ -62,7 +62,7 @@ BW_p2
 
 ggsave(here::here("graph/Cohort1_BW.png"), BW_p2)
 
-# Boxplot + dotplot: Body weight, 1-week HFD ------------------------------
+# Boxplot + dotplot: Body weight, 2-week HFD ------------------------------
 
 # Change from wide to long format
 BW_long <- BW %>%
@@ -74,36 +74,42 @@ View(BW_long)
 # Rank the sex
 BW_long$Sex <- factor(BW_long$Sex, levels = c("Male", "Female"))
 
-# Plot week 1 data based on sex and diet (standard plot)
-week1_p1 <- BW_long %>%
-  filter(Week == "Week 1") %>%
+# Plot week 2 data based on sex and diet (standard plot)
+standard_theme_1 <- theme(
+  axis.text.x = element_text(color = "black", size = 14, face = "bold"),
+  axis.text.y = element_text(color = "black", size = 14, face = "bold"),
+  axis.title.y = element_text(color = "black", size = 14, face = "bold"),
+  legend.title = element_blank(),
+  legend.text = element_text(color = "black", size = 14, face = "bold"),
+  legend.position = c(0.9, 0.9),
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  panel.background = element_blank(),
+  panel.border = element_rect(colour = "black", fill = NA, size = 2),
+  plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"),
+  plot.title = element_text(color = "black", size = 14, face = "bold")
+)
+
+week2_p1 <- BW_long %>%
+  filter(Week == "Week 2") %>%
   ggplot(aes(x = Sex, y = Weight)) +
   geom_boxplot(aes(fill = Diet), position = position_dodge(width = 1), outlier.size = 0) +
   # Change fill color of the boxes
   scale_fill_manual(values = c("green3", "red")) +
   # Overlay dotplot
-  geom_dotplot(aes(color = Diet), binwidth = .5, stackdir = "center",
+  geom_dotplot(aes(color = Diet),
+    binwidth = .5, stackdir = "center",
     binaxis = "y", position = position_dodge(width = 1)
   ) +
   # Change the dot color to black
   scale_colour_manual(values = c("black", "black"))
 
-week1_p2 <- week1_p1 +
+week2_p2 <- week2_p1 +
   ylim(20, 40) +
-  labs(title = "1-week HFD", x = NULL, y = "Weight (g)") +
+  labs(title = "Body weight after 2-week HFD", x = NULL, y = "Weight (g)") +
   # Remove the label of the dots
   guides(color = FALSE) +
-  theme(
-    axis.line = element_line(colour = "black"),
-    axis.text.x = element_text(color = "black", size = 14, face = "bold"),
-    axis.text.y = element_text(color = "black", size = 14, face = "bold"),
-    axis.title.y = element_text(color = "black", size = 14, face = "bold"),
-    legend.title = element_text(color = "black", size = 14, face = "bold"),
-    legend.text = element_text(color = "black", size = 14, face = "bold"),
-    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-    panel.background = element_blank()
-  )
-  
-week1_p2
+  standard_theme_1
+
+week2_p2
 
 ggsave(here::here("graph/BW_week1_boxplot.png"), week1_p2) # Save 7.36 x 4.55 in image
