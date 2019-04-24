@@ -27,15 +27,17 @@ View(BW_long)
 
 # Calculate mean and sd of BW
 BW_stat <- BW_long %>%
-  group_by(Diet, Week) %>%
+  filter(Week == 0) %>%
+  group_by(Diet, Sex, Genotype) %>%
   summarise(
     avg_BW = mean(Weight, na.rm = TRUE),
     sd_BW = sd(Weight, na.rm = TRUE),
     count = n()
-  ) %>%
-  arrange(Week)
+  ) 
 
 View(BW_stat)
+
+write.csv(BW_stat, "data/Mouse_count_240419.csv")
 
 # Line plot
 BW_p1 <- BW_stat %>%
