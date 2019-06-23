@@ -70,12 +70,14 @@ p_fat <- list()
 
 for (i in unique(Mass_long$Sex)) {
   df <- Mass_long %>%
-    filter(Sex == i, Composition == "Fat") %>%
+    na.omit() %>%
+    filter(Sex == i, Composition == "Lean", Diet_duration == "1 week") %>%
     spread(Diet, Gram)
 
   print(df)
 
   Chow <- as.numeric(as.character(unlist(df$Chow)))
+  
   HFD <- as.numeric(as.character(unlist(df$HFD)))
 
   p <- t.test(Chow, HFD)
