@@ -1,7 +1,7 @@
 ---
-title: "Metabolic assessment (Gcg-TRAP mice on HFD)"
+title: "Metabolic assessment (GcgcreTRAP mice on HFD)"
 author: "LLi"
-date: "Updated on 7/23/2019"
+date: "Updated on 03/09/2019"
 output: html_document
 ---
 <style type="text/css">
@@ -40,23 +40,14 @@ library(readxl)
 library(knitr)
 ```
 
-```{r Load data set, include=FALSE}
-# Load data set
-Gcg_BW_Breeding <- read.csv("~/biology_graph/data/Gcg_BW_Breeding.csv", row.names = 1, stringsAsFactors = FALSE)
-View(Gcg_BW_Breeding)
-
-Mass <- read_excel("data/Gcg_DEXA.xlsx", col_types = c(
-  "text", "text", "text", "text", "text",
-  "numeric", "numeric", "numeric"
-))
-View(Mass)
-```
-
-## Increase of body weight (g)
-
 ## Increase of body weight (%)
 
-```{r Calculate percentage, include=FALSE}
+```{r Calculate gain of BW percentage, include=FALSE}
+# Load data set
+Gcg_BW_Breeding <- read.csv("~/biology_graph/data/Gcg_BW_Breeding.csv", row.names = 1, stringsAsFactors = FALSE)
+
+View(Gcg_BW_Breeding)
+
 # Check column names
 colnames(Gcg_BW_Breeding)
 
@@ -80,7 +71,7 @@ View(Percent_BW_Filter)
 
 # Change from wide to long format
 BW_Breeding_long <- Percent_BW_Filter %>%
-  gather(Week, Per_Gain, 14:18) %>%
+  gather(Week, Per_Gain, 16:20) %>%
   na.omit() %>% # Remove rows with missing values
   arrange(ID)
 
@@ -105,6 +96,9 @@ standard_theme_dotplot <- theme(
   axis.title.y = element_text(color = "black", size = 18, face = "bold"),
   strip.text.x = element_text(color = "black", size = 18, face = "bold"),
   strip.background = element_rect(fill = "white"),
+  legend.title = element_blank(),
+  legend.text = element_text(color = "black", size = 16, face = "bold"),
+  legend.key = element_rect(fill = "white"), # Remove grey background of the legend
   panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
   panel.background = element_blank(),
   panel.border = element_rect(colour = "black", fill = NA, size = 2),
@@ -115,20 +109,28 @@ standard_theme_dotplot <- theme(
 # Plot HFD vs chow, grid by sex
 BW_p1 <- BW_Breeding_long %>%
   ggplot(aes(x = Week, y = Per_Gain, color = Diet)) +
-  geom_boxplot(position = position_dodge(0.8), outlier.shape = NA) +
-  geom_jitter(position = position_dodge(0.8), size = 1) +
+  geom_boxplot(outlier.shape = NA, lwd = 0.5) +
+  geom_point(size = 2, position = position_jitterdodge()) +
   facet_grid(cols = vars(Sex))
 
-BW_p1 +
+BW_p2 <- BW_p1 +
   labs(x = "Week", y = "Increase of body weight (%)") +
   scale_color_manual(values = c("green4", "red3")) +
   ylim(-1, 45) +
   standard_theme_dotplot
+
+BW_p2
 ```
 
 ## Increase of fat mass (%)
 
 ```{r Calculate fat percentage, include=FALSE}
+# Load data set
+Mass <- read_excel("data/Gcg_DEXA.xlsx", col_types = c(
+  "text", "text", "text", "text", "text", "numeric", "numeric", "numeric"))
+
+View(Mass)
+
 # Check column names
 colnames(Mass)
 
@@ -146,27 +148,21 @@ Fat_mass$Sex <- factor(Fat_mass$Sex, levels = c("Male", "Female"))
 # Plot HFD vs chow, grid by sex
 Fat_p1 <- Fat_mass %>%
   ggplot(aes(x = Diet_duration, y = Percent_fat, color = Diet)) +
-  geom_boxplot(position = position_dodge(0.8), outlier.shape = NA) +
-  geom_jitter(position = position_dodge(0.8), size = 1) +
+  geom_boxplot(outlier.shape = NA, lwd = 0.5) +
+  geom_point(size = 2, position = position_jitterdodge()) +
   facet_grid(cols = vars(Sex))
 
-Fat_p1 +
+Fat_p2 <- Fat_p1 +
   labs(x = NULL, y = "Fat mass (% of total mass)") +
   scale_color_manual(values = c("green4", "red3")) +
   standard_theme_dotplot
+
+Fat_p2
 ```
-
-
-
-
-
-
-
-
 
 ## ipGTT
 
-```{r Calculate mean and SEM, echo=FALSE}
+```{r Calculate GTT mean and SEM, echo=FALSE}
 # Open data set of GTT
 GTT <- read_excel("data/Gcg_GTT.xlsx", col_types = c(
   "text", "text", "text", "text", "text",
@@ -260,13 +256,13 @@ GTT_p2 <- GTT_p1 +
   scale_x_continuous(breaks = seq(0, 120, 15)) + ylim(0, 25) +
   scale_color_manual(values = c("green4", "red3")) +
   standard_theme_facet_line
-  
+
 GTT_p2
 
 # GTT line graph, only 1 week
 GTT_p3 <- GTT_stat %>%
   filter(Diet_duration == "1 week") %>%
-  ggplot(aes(x = Minute, y = avg_Glc, color = Diet)) 
+  ggplot(aes(x = Minute, y = avg_Glc, color = Diet))
 
 GTT_p4 <- GTT_p3 +
   geom_point(size = 4) +
@@ -277,7 +273,190 @@ GTT_p4 <- GTT_p3 +
   scale_x_continuous(breaks = seq(0, 120, 15)) + ylim(0, 25) +
   scale_color_manual(values = c("green4", "red3")) +
   standard_theme_facet_line
-  
+
 GTT_p4
 ```
+
+## ipITT
+
+```{r Calculate ITT mean and SEM, echo=FALSE}
+# Open data set of ITT
+ITT <- read_excel("data/Gcg_ITT.xlsx", col_types = c("text", "text", "text", "text", "text", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric"))
+
+View(ITT)
+
+# Calculate average of each duplicates
+for (i in c(0, 15, 30, 45, 60, 90, 120)) {
+  ITT[, paste0("min", i)] <- rowMeans(ITT[c(paste0("min", i, "_n1"), paste0("min", i, "_n2"))], na.rm = TRUE)
+}
+
+View(ITT)
+
+# Remove duplicated raw data and time point 90 and 120
+ITT_min <- subset(ITT, select = -c(min0_n1:min120_n2, min90, min120))
+
+View(ITT_min)
+
+# Calculate percentage of glucose decrease
+Percent_ITT <- ITT_min %>%
+  mutate(
+    Percent0 = (min0 / min0) * 100,
+    Percent15 = (min15 / min0) * 100,
+    Percent30 = (min30 / min0) * 100,
+    Percent45 = (min45 / min0) * 100,
+    Percent60 = (min60 / min0) * 100
+  )
+
+View(Percent_ITT)
+
+# Remove initial glucose values
+Percent_ITT <- subset(Percent_ITT, select = -c(min0:min60))
+
+# Change to long format
+ITT_long <- Percent_ITT %>%
+  gather(Minute, Glycemia, 7:11) %>%
+  na.omit() # Remove rows with missing values
+
+View(ITT_long)
+
+# Change Minute to numeric
+ITT_long$Minute <- gsub("Percent", "", ITT_long$Minute)
+
+ITT_long$Minute <- as.numeric(ITT_long$Minute)
+
+# Rank the week
+ITT_long$Diet_duration <- factor(ITT_long$Diet_duration, levels = c("2 day", "1 week", "2 week", "12 week"))
+
+```
+
+```{r ipITT, echo=FALSE, fig.height=8, fig.width=8}
+# Set standard theme for faceted line graph
+standard_theme_facet_line <- theme(
+  axis.line = element_line(colour = "black"),
+  axis.text.x = element_text(color = "black", size = 16, face = "bold"),
+  axis.text.y = element_text(color = "black", size = 16, face = "bold"),
+  axis.title.x = element_text(color = "black", size = 18, face = "bold"),
+  axis.title.y = element_text(color = "black", size = 18, face = "bold"),
+  strip.text.x = element_text(color = "black", size = 18, face = "bold"),
+  strip.text.y = element_text(color = "black", size = 18, face = "bold"),
+  strip.background = element_rect(fill = "white"),
+  legend.title = element_blank(),
+  legend.text = element_text(color = "black", size = 16, face = "bold"),
+  legend.key = element_rect(fill = "white"), # Remove grey background of the legend
+  legend.position = c(0.9, 0.9),
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  panel.background = element_blank(),
+  panel.border = element_rect(colour = "black", fill = NA, size = 2),
+  plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"),
+  plot.title = element_text(color = "black", size = 20, face = "bold")
+)
+
+# ITT line graph on female and 0.5 U/kg, grid by week
+ITT_p1 <- ITT_long %>%
+  filter(Insulin_U_kg == 0.50, Sex == "Female") %>%
+  ggplot(aes(x = Minute, y = Glycemia, color = Diet, group = ID))
+
+ITT_p2 <- ITT_p1 +
+  geom_point(size = 4) +
+  geom_line(size = 1.5) +
+  facet_grid(. ~ Diet_duration) +
+  labs(title = "ipITT (0.5 unit/kg) - Female", y = "Blood glucose (% of time 0)") +
+  scale_x_continuous(breaks = seq(0, 60, 15)) + ylim(0, 120) +
+  scale_color_manual(values = c("green4", "red3")) +
+  standard_theme_facet_line
+
+ITT_p2
+
+# ITT line graph on 0.4 U/kg, grid by sex
+ITT_p3 <- ITT_long %>%
+  filter(Insulin_U_kg == 0.40) %>%
+  ggplot(aes(x = Minute, y = Glycemia, color = Diet, group = ID))
+
+ITT_p4 <- ITT_p3 +
+  geom_point(size = 4) +
+  geom_line(size = 1.5) +
+  facet_grid(. ~ Sex) +
+  labs(title = "ipITT (0.4 unit/kg) - 1 week", y = "Blood glucose (% of time 0)") +
+  scale_x_continuous(breaks = seq(0, 60, 15)) + ylim(0, 120) +
+  scale_color_manual(values = c("green4", "red3")) +
+  standard_theme_facet_line
+
+ITT_p4
+
+```
+
+## Breeding statistics
+
+```{r breeding dataset, echo=FALSE}
+# Open data set of breeding stat
+Breed <- read_excel("data/Gcg_Male_Percentage.xlsx", col_types = c("date", "text", "text", "numeric", "numeric", "numeric", "numeric", "numeric"))
+
+View(Breed)
+
+# Calculate percentage of male and GcgcreTRAP
+Percent_Breed <- Breed %>%
+  mutate(
+    Percent_Male = (Male / Total) * 100,
+    Percent_GcgcreTRAP = (GcgcreTRAP / Total) * 100
+  )
+
+View(Percent_Breed)
+```
+
+```{r breeding dotplots, echo=FALSE, fig.height=8, fig.width=8}
+# Set plot parameters for dotplot
+standard_theme_dotplot <- theme(
+  axis.line = element_line(colour = "black"),
+  axis.text.x = element_text(color = "black", size = 16, face = "bold"),
+  axis.text.y = element_text(color = "black", size = 16, face = "bold"),
+  axis.title.x = element_text(color = "black", size = 18, face = "bold"),
+  axis.title.y = element_text(color = "black", size = 18, face = "bold"),
+  strip.text.x = element_text(color = "black", size = 18, face = "bold"),
+  legend.position = "none", # Remove entire legend
+  strip.background = element_rect(fill = "white"),
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  panel.background = element_blank(),
+  panel.border = element_rect(colour = "black", fill = NA, size = 2),
+  plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"),
+  plot.title = element_text(color = "black", size = 20, face = "bold")
+)
+
+# Plot male percentage individually, categorized by cage
+male_p1 <- Percent_Breed %>%
+  ggplot(aes(x = Father_ID, y = Percent_Male, color = Father_ID))
+
+male_p2 <- male_p1 +
+  geom_jitter(size = 4, na.rm = TRUE, width = 0.1, height = 0.1) +
+  labs(title = "% Male pups", x = "Father ID", y = "Male per litter (%)") +
+  scale_y_continuous(breaks = seq(0, 100, 10)) +
+  standard_theme_dotplot
+
+male_p2
+
+# Plot GcgcreTRAP percentage individually, categorized by cage
+cre_p1 <- Percent_Breed %>%
+  ggplot(aes(x = Father_ID, y = Percent_GcgcreTRAP, color = Father_ID))
+
+cre_p2 <- cre_p1 +
+  geom_jitter(size = 4, na.rm = TRUE, width = 0.2, height = 0.1) +
+  labs(title = "% GcgcreTRAP pups", x = "Father ID", y = "GcgcreTRAP per litter (%)") +
+  scale_y_continuous(breaks = seq(0, 100, 10)) +
+  standard_theme_dotplot
+
+cre_p2
+```
+
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+ggsave(here::here("graph/Percent_ITT_p5_030919.png"), ITT_p2, width = 12, height = 6)
+ggsave(here::here("graph/Percent_ITT_p4_030919.png"), ITT_p4, width = 8, height = 6)
+ggsave(here::here("graph/Percent_GTT_030919.png"), GTT_p2, width = 8, height = 8)
+ggsave(here::here("graph/Percent_Fat_030919.png"), Fat_p2, width = 8, height = 4)
+ggsave(here::here("graph/Percent_BW_030919.png"), BW_p2, width = 12, height = 6)
+ggsave(here::here("graph/Percent_Male_030919.png"), male_p2)
+ggsave(here::here("graph/Percent_Cre_030919.png"), cre_p2)
+```
+
+
+
+
 
