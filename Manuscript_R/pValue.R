@@ -52,10 +52,10 @@ p_BW
 
 # Body weight, week 4 -----------------------------------------------------
 # Any difference between Chow and HFD?
-df <- BW_long %>%
-  filter(Week == "Week 4") %>%
+df <- BW_Breeding_long %>%
+  filter(Week == 4, Sex == "Female") %>%
   na.omit() %>%
-  spread(Diet, Weight)
+  spread(Diet, Per_Gain)
 
 df
 
@@ -88,6 +88,18 @@ for (i in unique(Mass_long$Sex)) {
 }
 
 p_fat
+
+# Another way of analysis
+df <- Fat_mass %>%
+  filter(Diet_duration == "4 week", Sex == "Female") %>%
+  spread(Diet, Lean_gram)
+
+df
+
+Chow <- as.numeric(as.character(unlist(df$Chow)))
+HFD <- as.numeric(as.character(unlist(df$HFD)))
+
+t.test(Chow, HFD)
 
 # Glycemia, T0 ------------------------------------------------------------
 
@@ -132,7 +144,7 @@ t.test(Chow, HFD)
 # GTT, 15 min -------------------------------------------------------------
 # Any difference between Chow and HFD at 15 min?
 df <- GTT_long %>%
-  filter(Diet_duration == "1 week", Sex == "Female", Minute == 15) %>%
+  filter(Diet_duration == "4 week", Sex == "Female", Minute == 120) %>%
   spread(Diet, Glycemia)
 
 df
@@ -153,3 +165,16 @@ Chow <- as.numeric(as.character(unlist(df$Chow)))
 HFD <- as.numeric(as.character(unlist(df$HFD)))
 
 t.test(Chow, HFD)
+
+# AUC, week 4 -------------------------------------------------------------
+df <- AUC_ipGTT %>%
+  filter(Diet_duration == "4 week", Sex == "Female") %>%
+  spread(Diet, AUC)
+
+df
+
+Chow <- as.numeric(as.character(unlist(df$Chow)))
+HFD <- as.numeric(as.character(unlist(df$HFD)))
+
+t.test(Chow, HFD)
+

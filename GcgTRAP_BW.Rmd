@@ -145,7 +145,7 @@ Fat_mass$Sex <- factor(Fat_mass$Sex, levels = c("Male", "Female"))
 ```
 
 ```{r Fat mass percent, echo=FALSE}
-# Plot HFD vs chow, grid by sex
+# Plot fat percentage, HFD vs chow, grid by sex
 Fat_p1 <- Fat_mass %>%
   ggplot(aes(x = Diet_duration, y = Percent_fat, color = Diet)) +
   geom_boxplot(outlier.shape = NA, lwd = 0.5) +
@@ -155,6 +155,22 @@ Fat_p1 <- Fat_mass %>%
 Fat_p2 <- Fat_p1 +
   labs(x = NULL, y = "Fat mass (% of total mass)") +
   scale_color_manual(values = c("green4", "red3")) +
+  ylim(0, 50) +
+  standard_theme_dotplot
+
+Fat_p2
+
+# Plot fat mass, HFD vs chow, grid by sex
+Fat_p1 <- Fat_mass %>%
+  ggplot(aes(x = Diet_duration, y = Lean_gram, color = Diet)) +
+  geom_boxplot(outlier.shape = NA, lwd = 0.5) +
+  geom_point(size = 2, position = position_jitterdodge()) +
+  facet_grid(cols = vars(Sex))
+
+Fat_p2 <- Fat_p1 +
+  labs(x = NULL, y = "Lean mass (g)") +
+  scale_color_manual(values = c("green4", "red3")) +
+  ylim(10, 40) +
   standard_theme_dotplot
 
 Fat_p2
@@ -275,6 +291,58 @@ GTT_p4 <- GTT_p3 +
   standard_theme_facet_line
 
 GTT_p4
+```
+
+```{r AUC, echo=FALSE}
+# Calculate area under the curve
+library(DescTools)
+
+AUC_ipGTT <- GTT_long %>%
+  group_by(Diet_duration, Sex, Diet, ID) %>%
+  summarise(AUC = AUC(y = Glycemia, x = Minute))
+
+View(AUC_ipGTT)
+
+AUC_ipGTT <- as.data.frame(AUC_ipGTT)
+
+# Rank the sex
+AUC_ipGTT$Sex <- factor(AUC_ipGTT$Sex, levels = c("Male", "Female"))
+```
+
+```{r AUC ipGTT, echo=FALSE}
+standard_theme_dotplot <- theme(
+  axis.line = element_line(colour = "black"),
+  axis.text.x = element_text(color = "black", size = 16, face = "bold"),
+  axis.text.y = element_text(color = "black", size = 16, face = "bold"),
+  axis.title.x = element_blank(),
+  axis.title.y = element_text(color = "black", size = 18, face = "bold"),
+  strip.text.x = element_text(color = "black", size = 18, face = "bold"),
+  strip.background = element_rect(fill = "white"),
+  legend.title = element_blank(),
+  legend.text = element_text(color = "black", size = 16, face = "bold"),
+  legend.key = element_rect(fill = "white"), # Remove grey background of the legend
+  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  panel.background = element_blank(),
+  panel.border = element_rect(colour = "black", fill = NA, size = 2),
+  plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"),
+  plot.title = element_text(color = "black", size = 20, face = "bold")
+)
+
+# Plot HFD vs chow, grid by sex
+AUC_p1 <- AUC_ipGTT %>%
+  filter(Diet_duration %in% c("1 week", "4 week")) %>%
+  ggplot(aes(x = Diet_duration, y = AUC, color = Diet)) +
+  geom_boxplot(outlier.shape = NA, lwd = 0.5) +
+  geom_point(size = 2, position = position_jitterdodge()) +
+  facet_grid(cols = vars(Sex))
+
+AUC_p2 <- AUC_p1 +
+  labs(x = "Week", y = "Area Under the Curve") +
+  scale_color_manual(values = c("green4", "red3")) +
+  ylim(0, 3000) +
+  standard_theme_dotplot
+
+AUC_p2
 ```
 
 ## ipITT
@@ -450,7 +518,8 @@ cre_p2
 ggsave(here::here("graph/Percent_ITT_p5_030919.png"), ITT_p2, width = 12, height = 6)
 ggsave(here::here("graph/Percent_ITT_p4_030919.png"), ITT_p4, width = 8, height = 6)
 ggsave(here::here("graph/Percent_GTT_030919.png"), GTT_p2, width = 8, height = 8)
-ggsave(here::here("graph/Percent_Fat_030919.png"), Fat_p2, width = 8, height = 4)
+ggsave(here::here("graph/LeanMass_060919.png"), Fat_p2, width = 8, height = 4)
+ggsave(here::here("graph/AUC_GTT_060919.png"), AUC_p2, width = 8, height = 4)
 ggsave(here::here("graph/Percent_BW_030919.png"), BW_p2, width = 12, height = 6)
 ggsave(here::here("graph/Percent_Male_030919.png"), male_p2)
 ggsave(here::here("graph/Percent_Cre_030919.png"), cre_p2)
