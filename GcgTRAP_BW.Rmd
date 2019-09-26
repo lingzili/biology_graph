@@ -496,7 +496,7 @@ male_p1 <- Percent_Breed %>%
 male_p2 <- male_p1 +
   geom_jitter(size = 4, na.rm = TRUE, width = 0.1, height = 0.1) +
   labs(title = "% Male pups", x = "Father ID", y = "Male per litter (%)") +
-  scale_y_continuous(breaks = seq(0, 100, 10)) +
+  ylim(-5, 100) +
   standard_theme_dotplot
 
 male_p2
